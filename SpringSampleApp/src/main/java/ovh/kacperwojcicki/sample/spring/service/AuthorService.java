@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ovh.kacperwojcicki.sample.spring.dto.AuthorSaveDTO;
+import ovh.kacperwojcicki.sample.spring.controller.dto.AuthorSaveDTO;
 import ovh.kacperwojcicki.sample.spring.model.Author;
 import ovh.kacperwojcicki.sample.spring.repository.AuthorRepository;
 
@@ -37,18 +37,18 @@ public class AuthorService {
         }
     }
 
-    public void updateAuthor(Author author) {
-        if(!authorRepository.existsById(author.getAuthorId())) {
+    public Author updateAuthor(AuthorSaveDTO author, long authorId) {
+        if(!authorRepository.existsById(authorId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        Author authorToUpdate = getAuthor(author.getAuthorId())
+        Author authorToUpdate = getAuthor(authorId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
 
-        authorToUpdate.setFirstName(author.getFirstName());
-        authorToUpdate.setLastName(author.getLastName());
+        authorToUpdate.setFirstName(author.firstName());
+        authorToUpdate.setLastName(author.lastName());
 
-        authorRepository.save(authorToUpdate);
+        return authorRepository.save(authorToUpdate);
     }
 
 }

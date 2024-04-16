@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ovh.kacperwojcicki.sample.spring.dto.AuthorDTO;
-import ovh.kacperwojcicki.sample.spring.dto.AuthorSaveDTO;
+import ovh.kacperwojcicki.sample.spring.controller.dto.AuthorDTO;
+import ovh.kacperwojcicki.sample.spring.controller.dto.AuthorSaveDTO;
 import ovh.kacperwojcicki.sample.spring.model.Author;
 import ovh.kacperwojcicki.sample.spring.service.AuthorService;
 
@@ -34,6 +34,17 @@ public class AuthorController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST));
 
         return ResponseEntity.ok(new AuthorDTO(author.getAuthorId(), author.getFirstName(), author.getLastName()));
+    }
+
+    @DeleteMapping("/{authorId}")
+    public ResponseEntity<Void> deleteAuthor(@PathVariable long authorId) {
+        authorService.deleteAuthor(authorId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/{authorId}")
+    public ResponseEntity<Author> updateAuthor(@PathVariable long authorId, AuthorSaveDTO authorSaveDTO) {
+        return ResponseEntity.ok(authorService.updateAuthor(authorSaveDTO, authorId));
     }
 
     @PostMapping

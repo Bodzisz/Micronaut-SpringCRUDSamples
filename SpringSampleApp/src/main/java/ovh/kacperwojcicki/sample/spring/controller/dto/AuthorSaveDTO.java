@@ -1,4 +1,4 @@
-package ovh.kacperwojcicki.sample.spring.dto;
+package ovh.kacperwojcicki.sample.spring.controller.dto;
 
 import ovh.kacperwojcicki.sample.spring.model.Author;
 
