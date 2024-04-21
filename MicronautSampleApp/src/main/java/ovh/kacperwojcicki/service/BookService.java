@@ -1,7 +1,11 @@
 package ovh.kacperwojcicki.service;
 
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.exceptions.HttpException;
+import io.micronaut.http.exceptions.HttpStatusException;
 import jakarta.inject.Singleton;
 import ovh.kacperwojcicki.controller.dto.BookSaveDTO;
+import ovh.kacperwojcicki.exception.HttpBodyMessageException;
 import ovh.kacperwojcicki.model.Author;
 import ovh.kacperwojcicki.model.Book;
 import ovh.kacperwojcicki.repository.BookRepository;
@@ -10,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-//@RequiredArgsConstructor
 public class BookService {
 
     private final BookRepository bookRepository;
@@ -30,8 +33,10 @@ public class BookService {
     }
 
     public Book saveBook(BookSaveDTO bookToSave) {
-        Author author = authorService.getAuthor(bookToSave.authorId())
-                .orElseThrow(() -> new RuntimeException());
+        long authorId = bookToSave.authorId();
+        Author author = authorService.getAuthor(authorId)
+                .orElseThrow(() -> new HttpBodyMessageException(HttpStatus.BAD_REQUEST,
+                        "Author with such id does not exist: " + authorId));
 
         Book book = new Book();
         book.setBookId(0);
@@ -45,7 +50,7 @@ public class BookService {
 
     public void deleteBook(long bookId) {
         if(!bookRepository.existsById(bookId)) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new HttpBodyMessageException(HttpStatus.BAD_REQUEST, "Book with such id does not exist: " + bookId);
         }
 
         bookRepository.deleteById(bookId);

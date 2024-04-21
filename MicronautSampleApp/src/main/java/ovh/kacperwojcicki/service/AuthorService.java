@@ -1,7 +1,9 @@
 package ovh.kacperwojcicki.service;
 
+import io.micronaut.http.HttpStatus;
 import jakarta.inject.Singleton;
 import ovh.kacperwojcicki.controller.dto.AuthorSaveDTO;
+import ovh.kacperwojcicki.exception.HttpBodyMessageException;
 import ovh.kacperwojcicki.model.Author;
 import ovh.kacperwojcicki.repository.AuthorRepository;
 
@@ -9,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-//@RequiredArgsConstructor
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
@@ -31,20 +32,16 @@ public class AuthorService {
     }
 
     public void deleteAuthor(long authorId) {
-        if(authorRepository.existsById(authorId)) {
-            authorRepository.deleteById(authorId);
-        } else {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        if(!authorRepository.existsById(authorId)) {
+            throw new HttpBodyMessageException(HttpStatus.BAD_REQUEST, "Author with such id does not exist:" + authorId);
         }
+
+        authorRepository.deleteById(authorId);
     }
 
     public Author updateAuthor(AuthorSaveDTO author, long authorId) {
-        if(!authorRepository.existsById(authorId)) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        Author authorToUpdate = getAuthor(authorId)
-                .orElseThrow(() -> new RuntimeException());
+        Author authorToUpdate = authorRepository.findById(authorId).orElseThrow(() ->
+                new HttpBodyMessageException(HttpStatus.BAD_REQUEST, "Author with such id does not exist:" + authorId));
 
         authorToUpdate.setFirstName(author.firstName());
         authorToUpdate.setLastName(author.lastName());
